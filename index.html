@@ -3,69 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Task Manager</title>
+    <meta name="description" content="An advanced, beautiful, and efficient task management web app for students.">
+    <title>TaskMaster Pro — Academic Task Manager</title>
+    
+    <!-- Google Fonts & Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <main class="container">
-        <!-- Application Header -->
-        <header>
-            <h1>📚 Student Task Manager</h1>
-            <p>Organize, track, and search your academic tasks efficiently.</p>
-        </header>
+    <!-- SVG Icon Definitions (Reusable Symbols) -->
+    <svg style="display: none;">
+        <symbol id="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5v14M5 12h14"/>
+        </symbol>
+        <symbol id="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+        </symbol>
+        <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+        </symbol>
+        <symbol id="icon-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+        </symbol>
+        <symbol id="icon-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3l1.912 5.813a2 2 0 001.275 1.275L21 12l-5.813 1.912a2 2 0 00-1.275 1.275L12 21l-1.912-5.813a2 2 0 00-1.275-1.275L3 12l5.813-1.912a2 2 0 001.275-1.275L12 3z"/>
+        </symbol>
+        <symbol id="icon-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+        </symbol>
+    </svg>
 
-        <!-- Live Task Search Section (Task Search Feature) -->
-        <section class="search-section">
-            <h2>🔍 Search Tasks</h2>
-            <div class="form-group">
-                <input 
-                    type="text" 
-                    id="search-input" 
-                    placeholder="Type a keyword to filter tasks..." 
-                    autocomplete="off"
-                >
-            </div>
-        </section>
+    <div class="app-wrapper">
+        <main class="app-container" role="main">
+            
+            <!-- Main Application Header -->
+            <header class="app-header">
+                <div class="brand">
+                    <div class="brand-badge" aria-hidden="true">
+                        <svg class="icon"><use href="#icon-sparkles"/></svg>
+                    </div>
+                    <div>
+                        <h1 class="brand-title">TaskMaster <span class="badge-pro">PRO</span></h1>
+                        <p class="brand-subtitle">Streamline your academic workload effortlessly.</p>
+                    </div>
+                </div>
+                
+                <!-- Live Dashboard Metrics -->
+                <div class="stats-container" role="status" aria-live="polite">
+                    <div class="stat-card">
+                        <span class="stat-value" id="stat-total">0</span>
+                        <span class="stat-label">Total</span>
+                    </div>
+                    <div class="stat-card stat-completed">
+                        <span class="stat-value" id="stat-completed">0</span>
+                        <span class="stat-label">Done</span>
+                    </div>
+                </div>
+            </header>
 
-        <!-- New Task Form Section -->
-        <section class="form-section">
-            <h2>➕ Add New Task</h2>
-            <form id="task-form">
-                <div class="form-group">
-                    <label for="task-title">Task Title</label>
+            <!-- Task Creation Form Card -->
+            <section class="card form-card" aria-labelledby="form-heading">
+                <div class="card-header">
+                    <h2 id="form-heading" class="card-title">
+                        <svg class="icon title-icon" aria-hidden="true"><use href="#icon-plus"/></svg>
+                        Create Task
+                    </h2>
+                </div>
+
+                <form id="task-form" autocomplete="off" novalidate>
+                    <div class="form-grid">
+                        
+                        <!-- Task Title Input -->
+                        <div class="form-group span-2">
+                            <label for="task-title">Task Title <span class="required">*</span></label>
+                            <input 
+                                type="text" 
+                                id="task-title" 
+                                name="title"
+                                placeholder="e.g., Complete Assignment 2 for Computer Science" 
+                                required 
+                                maxlength="80"
+                            >
+                        </div>
+
+                        <!-- Priority Selector -->
+                        <div class="form-group span-1">
+                            <label for="task-priority">Priority</label>
+                            <div class="select-wrapper">
+                                <select id="task-priority" name="priority" class="select-input">
+                                    <option value="medium" selected>⚡ Medium</option>
+                                    <option value="high">🔥 High</option>
+                                    <option value="low">🌱 Low</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Task Category / Subject (Optional tag) -->
+                        <div class="form-group span-1">
+                            <label for="task-category">Category</label>
+                            <input 
+                                type="text" 
+                                id="task-category" 
+                                name="category"
+                                placeholder="e.g., Homework, Exam" 
+                                maxlength="20"
+                            >
+                        </div>
+
+                        <!-- Task Description -->
+                        <div class="form-group span-2">
+                            <label for="task-desc">Task Notes & Description</label>
+                            <textarea 
+                                id="task-desc" 
+                                name="description"
+                                rows="3" 
+                                placeholder="Add key instructions, deadline details, or links..."
+                                maxlength="300"
+                            ></textarea>
+                        </div>
+
+                    </div>
+
+                    <!-- Action Submit Button -->
+                    <button type="submit" id="add-btn" class="btn btn-primary">
+                        <span>Add New Task</span>
+                        <svg class="icon-btn" aria-hidden="true"><use href="#icon-plus"/></svg>
+                    </button>
+                </form>
+            </section>
+
+            <!-- Live Search & Filter Bar -->
+            <section class="search-filter-section" aria-label="Task Filters">
+                <div class="search-box">
+                    <svg class="search-icon" aria-hidden="true"><use href="#icon-search"/></svg>
                     <input 
                         type="text" 
-                        id="task-title" 
-                        placeholder="e.g., Complete Assignment 2" 
-                        required
+                        id="search-input" 
+                        placeholder="Search tasks by title or keyword..." 
+                        aria-label="Search Tasks"
                     >
                 </div>
-
-                <div class="form-group">
-                    <label for="task-desc">Task Description</label>
-                    <textarea 
-                        id="task-desc" 
-                        rows="3" 
-                        placeholder="Enter task details or instructions..." 
-                        required
-                    ></textarea>
-                </div>
-
-                <button type="submit" id="add-btn">Add Task</button>
-            </form>
-        </section>
-
-        <!-- Dynamic Task List Container -->
-        <section class="list-section">
-            <h2>📋 Task List</h2>
-            <ul id="task-list" class="task-list">
-                <!-- Dynamic task cards will be rendered here by script.js -->
-            </ul>
-        </section>
-    </main>
-
-    <!-- JavaScript Application Logic -->
-    <script src="script.js"></script>
-</body>
-</html>
+                
+                <!-- Quick Filter Tabs -->
+                <div class="filter-pills" role="tablist" aria-label="Task Status Filters">
+                    <button type="button" class="pill-btn active" data-filter="all" role="tab" aria-selected="true">All</button>
+                    <button type="button" class="pill-btn" data-filter="active" role="tab" aria
