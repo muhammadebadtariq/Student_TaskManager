@@ -6,7 +6,7 @@ A collaborative, lightweight web application built with HTML5, CSS3, and modern 
 
 ## 🚀 Features
 
-- **Task Creation & Management:** Easily add new academic tasks with titles and descriptions.
+- **Task Creation & Management:** Easily adding new academic tasks with titles and descriptions.
 - **Task Completion Toggle:** Mark tasks as completed with real-time visual feedback and strike-through formatting.
 - **Dynamic Task Search:** Filter through active and completed tasks in real time using a responsive search bar.
 - **Fully Responsive Design:** Optimized layout for desktop, tablet, and mobile viewports ($\le 540\text{px}$).
