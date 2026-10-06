@@ -1,4 +1,5 @@
 # 📋 Student Task Manager Tracker
+# 📋 Student Task Manager
 
 A collaborative, lightweight web application built with HTML5, CSS3, and modern JavaScript (ES6+). This project demonstrates real-world software engineering practices, pair programming, and advanced Git/GitHub workflows, including feature branching, issue tracking, peer pull request reviews, merge conflict resolution, and semantic release tagging.
 
