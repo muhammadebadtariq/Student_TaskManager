@@ -1,106 +1,161 @@
 
 /* ==========================================================================
-   Student Task Manager — Core Application Logic (script.js)
+   Student Task Manager — Core Logic with LocalStorage
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
-    // DOM Element Selections
+    // DOM Elements
     const taskForm = document.getElementById('task-form');
     const taskTitleInput = document.getElementById('task-title');
     const taskDescInput = document.getElementById('task-desc');
+    const taskPriorityInput = document.getElementById('task-priority');
     const taskList = document.getElementById('task-list');
     const searchInput = document.getElementById('search-input');
+    const emptyState = document.getElementById('empty-state');
+    
+    const statTotal = document.getElementById('stat-total');
+    const statCompleted = document.getElementById('stat-completed');
 
-    // 1. Task Form Submission Handler
+    // Load tasks from LocalStorage
+    let tasks = JSON.parse(localStorage.getItem('tasks_data')) || [];
+
+    // Save tasks to LocalStorage
+    function saveTasks() {
+        localStorage.setItem('tasks_data', JSON.stringify(tasks));
+        updateStats();
+    }
+
+    // Update Header Counter Stats
+    function updateStats() {
+        const total = tasks.length;
+        const completed = tasks.filter(t => t.completed).length;
+
+        statTotal.textContent = total;
+        statCompleted.textContent = completed;
+
+        // Toggle Empty State Visibility
+        if (total === 0) {
+            emptyState.style.display = 'block';
+        } else {
+            emptyState.style.display = 'none';
+        }
+    }
+
+    // Render Initial Tasks
+    function renderTasks() {
+        taskList.innerHTML = '';
+        tasks.forEach(task => appendTaskCardToDOM(task));
+        updateStats();
+        filterTasks();
+    }
+
+    // Form Submission Handler
     taskForm.addEventListener('submit', (e) => {
         e.preventDefault();
 
-        // Get trimmed values from form inputs
         const titleText = taskTitleInput.value.trim();
         const descText = taskDescInput.value.trim();
+        const priorityText = taskPriorityInput.value;
 
-        // Prevent empty or whitespace-only submissions
-        if (!titleText || !descText) {
-            alert('Please fill in both the task title and description.');
-            return;
-        }
+        if (!titleText || !descText) return;
 
-        // Create new task card element
-        createTaskCard(titleText, descText);
+        const newTask = {
+            id: Date.now().toString(),
+            title: titleText,
+            desc: descText,
+            priority: priorityText,
+            completed: false
+        };
 
-        // Reset form inputs after successful creation
+        tasks.unshift(newTask);
+        saveTasks();
+        renderTasks();
+
         taskForm.reset();
         taskTitleInput.focus();
     });
 
-    // 2. Function to Create and Append a Task Card
-    function createTaskCard(title, description) {
-        // Create <li> container for task card
+    // Append Task Card to DOM safely
+    function appendTaskCardToDOM(task) {
         const li = document.createElement('li');
-        li.className = 'task-card';
+        li.className = `task-card ${task.completed ? 'completed' : ''}`;
+        li.dataset.id = task.id;
 
-        // Inner HTML structure for task card
         li.innerHTML = `
             <div class="task-info">
-                <h3 class="task-title"></h3>
+                <div class="task-header">
+                    <span class="priority-badge ${task.priority}">${task.priority}</span>
+                    <h3 class="task-title"></h3>
+                </div>
                 <p class="task-desc"></p>
             </div>
             <div class="task-actions">
-                <button class="btn-complete" type="button">Complete</button>
-                <button class="btn-delete" type="button">Delete</button>
+                <button class="action-btn check" title="${task.completed ? 'Mark incomplete' : 'Mark complete'}">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M20 6L9 17l-5-5"/>
+                    </svg>
+                </button>
+                <button class="action-btn delete" title="Delete task">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                    </svg>
+                </button>
             </div>
         `;
 
-        // Safely insert text content to prevent XSS vulnerabilities
-        li.querySelector('.task-title').textContent = title;
-        li.querySelector('.task-desc').textContent = description;
+        // Safe insertion of user input against XSS
+        li.querySelector('.task-title').textContent = task.title;
+        li.querySelector('.task-desc').textContent = task.desc;
 
-        // Event Listener: Toggle Task Completion Status
-        const completeBtn = li.querySelector('.btn-complete');
-        completeBtn.addEventListener('click', () => {
-            li.classList.toggle('completed');
-            if (li.classList.contains('completed')) {
-                completeBtn.textContent = 'Undo';
-            } else {
-                completeBtn.textContent = 'Complete';
-            }
-            // Trigger search filter refresh to preserve current search state
-            filterTasks();
+        // Complete Event Listener
+        li.querySelector('.check').addEventListener('click', () => {
+            task.completed = !task.completed;
+            saveTasks();
+            renderTasks();
         });
 
-        // Event Listener: Delete Task Card
-        const deleteBtn = li.querySelector('.btn-delete');
-        deleteBtn.addEventListener('click', () => {
-            li.remove();
+        // Delete Event Listener
+        li.querySelector('.delete').addEventListener('click', () => {
+            li.style.transform = 'scale(0.95)';
+            li.style.opacity = '0';
+            setTimeout(() => {
+                tasks = tasks.filter(t => t.id !== task.id);
+                saveTasks();
+                renderTasks();
+            }, 200);
         });
 
-        // Append new task card to task list container
         taskList.appendChild(li);
-
-        // Run filter check in case a search query is actively typed
-        filterTasks();
     }
 
-    // 3. Live Task Search & Filtering Functionality
+    // Live Task Search & Filtering Function
     function filterTasks() {
         const query = searchInput.value.toLowerCase().trim();
-        const tasks = taskList.querySelectorAll('.task-card');
+        const cards = taskList.querySelectorAll('.task-card');
+        let visibleCount = 0;
 
-        tasks.forEach((task) => {
-            const title = task.querySelector('.task-title').textContent.toLowerCase();
-            const desc = task.querySelector('.task-desc').textContent.toLowerCase();
+        cards.forEach((card) => {
+            const title = card.querySelector('.task-title').textContent.toLowerCase();
+            const desc = card.querySelector('.task-desc').textContent.toLowerCase();
 
-            // Match query against title or description
             if (title.includes(query) || desc.includes(query)) {
-                task.style.display = 'flex';
+                card.style.display = 'flex';
+                visibleCount++;
             } else {
-                task.style.display = 'none';
+                card.style.display = 'none';
             }
         });
+
+        // Handle empty search result state
+        if (tasks.length > 0) {
+            emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
     }
 
-    // Attach Event Listener for Real-Time Search Filtering
     if (searchInput) {
         searchInput.addEventListener('input', filterTasks);
     }
-});s
+
+    // Initial Load
+    renderTasks();
+});
