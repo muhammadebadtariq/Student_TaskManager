@@ -3,120 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Task Dashboard</title>
-    <!-- Google Fonts -->
+    <meta name="description" content="An advanced, beautiful, and efficient task management web app for students.">
+    <title>TaskMaster Pro — Academic Task Manager</title>
+    
+    <!-- Google Fonts & Preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <main class="app-container">
-        <!-- Application Header -->
-        <header class="app-header">
-            <div class="brand">
-                <span class="brand-icon">✨</span>
-                <div>
-                    <h1>TaskMaster</h1>
-                    <p>Elevate your academic workflow and productivity.</p>
-                </div>
-            </div>
+    <!-- SVG Icon Definitions (Reusable Symbols) -->
+    <svg style="display: none;">
+        <symbol id="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5v14M5 12h14"/>
+        </symbol>
+        <symbol id="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+        </symbol>
+        <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+        </symbol>
+        <symbol id="icon-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+        </symbol>
+        <symbol id="icon-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3l1.912 5.813a2 2 0 001.275 1.275L21 12l-5.813 1.912a2 2 0 00-1.275 1.275L12 21l-1.912-5.813a2 2 0 00-1.275-1.275L3 12l5.813-1.912a2 2 0 001.275-1.275L12 3z"/>
+        </symbol>
+        <symbol id="icon-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+        </symbol>
+    </svg>
+
+    <div class="app-wrapper">
+        <main class="app-container" role="main">
             
-            <!-- Dynamic Stats Bar -->
-            <div class="stats-bar">
-                <div class="stat-pill">
-                    <span class="stat-label">Total</span>
-                    <span id="stat-total" class="stat-value">0</span>
-                </div>
-                <div class="stat-pill">
-                    <span class="stat-label">Completed</span>
-                    <span id="stat-completed" class="stat-value">0</span>
-                </div>
-            </div>
-        </header>
-
-        <!-- New Task Form Section -->
-        <section class="card form-section">
-            <h2 class="section-title">
-                <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-                Create New Task
-            </h2>
-            <form id="task-form">
-                <div class="form-grid">
-                    <div class="form-group full-width">
-                        <label for="task-title">Task Title</label>
-                        <input 
-                            type="text" 
-                            id="task-title" 
-                            placeholder="e.g., Complete CS50 Data Structures Assignment" 
-                            required
-                            autocomplete="off"
-                        >
+            <!-- Main Application Header -->
+            <header class="app-header">
+                <div class="brand">
+                    <div class="brand-badge" aria-hidden="true">
+                        <svg class="icon"><use href="#icon-sparkles"/></svg>
                     </div>
-
-                    <div class="form-group">
-                        <label for="task-priority">Priority Level</label>
-                        <select id="task-priority" class="select-input">
-                            <option value="medium">⚡ Medium Priority</option>
-                            <option value="high">🔥 High Priority</option>
-                            <option value="low">🌱 Low Priority</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="task-desc">Description & Notes</label>
-                        <textarea 
-                            id="task-desc" 
-                            rows="2" 
-                            placeholder="Add key details, links, or sub-tasks..." 
-                            required
-                        ></textarea>
+                    <div>
+                        <h1 class="brand-title">TaskMaster <span class="badge-pro">PRO</span></h1>
+                        <p class="brand-subtitle">Streamline your academic workload effortlessly.</p>
                     </div>
                 </div>
+                
+                <!-- Live Dashboard Metrics -->
+                <div class="stats-container" role="status" aria-live="polite">
+                    <div class="stat-card">
+                        <span class="stat-value" id="stat-total">0</span>
+                        <span class="stat-label">Total</span>
+                    </div>
+                    <div class="stat-card stat-completed">
+                        <span class="stat-value" id="stat-completed">0</span>
+                        <span class="stat-label">Done</span>
+                    </div>
+                </div>
+            </header>
 
-                <button type="submit" id="add-btn" class="btn btn-primary">
-                    <span>Add Task</span>
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                </button>
-            </form>
-        </section>
+            <!-- Task Creation Form Card -->
+            <section class="card form-card" aria-labelledby="form-heading">
+                <div class="card-header">
+                    <h2 id="form-heading" class="card-title">
+                        <svg class="icon title-icon" aria-hidden="true"><use href="#icon-plus"/></svg>
+                        Create Task
+                    </h2>
+                </div>
 
-        <!-- Live Task Search Section -->
-        <section class="search-section">
-            <div class="search-wrapper">
-                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-                <input 
-                    type="text" 
-                    id="search-input" 
-                    placeholder="Search tasks by title or content..." 
-                    autocomplete="off"
-                >
-            </div>
-        </section>
+                <form id="task-form" autocomplete="off" novalidate>
+                    <div class="form-grid">
+                        
+                        <!-- Task Title Input -->
+                        <div class="form-group span-2">
+                            <label for="task-title">Task Title <span class="required">*</span></label>
+                            <input 
+                                type="text" 
+                                id="task-title" 
+                                name="title"
+                                placeholder="e.g., Complete Assignment 2 for Computer Science" 
+                                required 
+                                maxlength="80"
+                            >
+                        </div>
 
-        <!-- Dynamic Task List Container -->
-        <section class="list-section">
-            <div class="list-header">
-                <h2 class="section-title">
-                    <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-                    Your Tasks
-                </h2>
-            </div>
-            
-            <ul id="task-list" class="task-list">
-                <!-- Task items dynamically appended here -->
-            </ul>
+                        <!-- Priority Selector -->
+                        <div class="form-group span-1">
+                            <label for="task-priority">Priority</label>
+                            <div class="select-wrapper">
+                                <select id="task-priority" name="priority" class="select-input">
+                                    <option value="medium" selected>⚡ Medium</option>
+                                    <option value="high">🔥 High</option>
+                                    <option value="low">🌱 Low</option>
+                                </select>
+                            </div>
+                        </div>
 
-            <!-- Empty State Fallback -->
-            <div id="empty-state" class="empty-state">
-                <div class="empty-icon">🎯</div>
-                <h3>All clear!</h3>
-                <p>No tasks found. Add a task above to get started.</p>
-            </div>
-        </section>
-    </main>
+                        <!-- Task Category / Subject (Optional tag) -->
+                        <div class="form-group span-1">
+                            <label for="task-category">Category</label>
+                            <input 
+                                type="text" 
+                                id="task-category" 
+                                name="category"
+                                placeholder="e.g., Homework, Exam" 
+                                maxlength="20"
+                            >
+                        </div>
 
-    <script src="script.js"></script>
-</body>
-</html>
+                        <!-- Task Description -->
+                        <div class="form-group span-2">
+                            <label for="task-desc">Task Notes & Description</label>
+                            <textarea 
+                                id="task-desc" 
+                                name="description"
+                                rows="3" 
+                                placeholder="Add key instructions, deadline details, or links..."
+                                maxlength="300"
+                            ></textarea>
+                        </div>
+
+                    </div>
+
+                    <!-- Action Submit Button -->
+                    <button type="submit" id="add-btn" class="btn btn-primary">
+                        <span>Add New Task</span>
+                        <svg class="icon-btn" aria-hidden="true"><use href="#icon-plus"/></svg>
+                    </button>
+                </form>
+            </section>
+
+            <!-- Live Search & Filter Bar -->
+            <section class="search-filter-section" aria-label="Task Filters">
+                <div class="search-box">
+                    <svg class="search-icon" aria-hidden="true"><use href="#icon-search"/></svg>
+                    <input 
+                        type="text" 
+                        id="search-input" 
+                        placeholder="Search tasks by title or keyword..." 
+                        aria-label="Search Tasks"
+                    >
+                </div>
+                
+                <!-- Quick Filter Tabs -->
+                <div class="filter-pills" role="tablist" aria-label="Task Status Filters">
+                    <button type="button" class="pill-btn active" data-filter="all" role="tab" aria-selected="true">All</button>
+                    <button type="button" class="pill-btn" data-filter="active" role="tab" aria
